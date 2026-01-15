@@ -24,7 +24,6 @@ jobs:
     secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
     with:
       module-dir: "mesazon-shared/environments"
-      module: "mesazon-shared"
       org: "mesazon"
       project: "mesazon-dev"
       env: "dev"
