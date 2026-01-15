@@ -1,0 +1,30 @@
+name: Mesazon Shared CI
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'mesazon-shared/**'
+      - 'modules/**'
+  pull_request:
+    paths:
+      - 'mesazon-shared/**'
+      - 'modules/**'
+jobs:
+  tf-plan-mesazon-dev:
+    uses: ./.github/workflows/tf-plan.yml
+    secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
+    with:
+      module-dir: "mesazon-shared/environments"
+      org: "mesazon"
+      project: "mesazon-dev"
+      env: "dev"
+  tf-apply-mesazon-dev:
+    needs: [ "tf-plan-mesazon-dev" ]
+    uses: ./.github/workflows/tf-apply.yml
+    secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
+    with:
+      module-dir: "mesazon-shared/environments"
+      module: "mesazon-shared"
+      org: "mesazon"
+      project: "mesazon-dev"
+      env: "dev"
