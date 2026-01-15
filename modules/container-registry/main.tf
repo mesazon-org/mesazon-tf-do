@@ -8,7 +8,7 @@ terraform {
 }
 
 resource "digitalocean_container_registry" "main" {
-  name                   = var.registry_name + "-" + var.env
+  name                   = var.registry_name
   subscription_tier_slug = var.subscription_tier
   region                 = var.region
 }
