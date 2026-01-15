@@ -1,7 +1,3 @@
-variable "env" {
-  type = string
-}
-
 variable "registry_name" {
   type = string
 }
