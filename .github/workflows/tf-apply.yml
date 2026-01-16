@@ -17,8 +17,11 @@ env:
 jobs:
   build:
     environment: manual_approval
-    name: ${{ inputs.module }}-{{ inputs.env }}-tf-apply
-    runs-on: ubuntu-latest
+    name: ${{ inputs.module }}-${{ inputs.env }}-tf-apply
+    runs-on: ubuntu-latest]
+    defaults:
+      run:
+        working-directory: ${{ inputs.module }}/environments/${{ inputs.env }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6

@@ -16,7 +16,7 @@ env:
   TF_VAR_do_token: ${{ secrets.DIGITALOCEAN_API_KEY }}
 jobs:
   build:
-    name: ${{ inputs.module }}-{{ inputs.env }}-tf-plan
+    name: ${{ inputs.module }}-${{ inputs.env }}-tf-plan
     runs-on: ubuntu-latest
     defaults:
       run:
