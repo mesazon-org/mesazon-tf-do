@@ -18,7 +18,7 @@ jobs:
   build:
     environment: manual_approval
     name: ${{ inputs.module }}-${{ inputs.env }}-tf-apply
-    runs-on: ubuntu-latest]
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ${{ inputs.module }}/environments/${{ inputs.env }}
