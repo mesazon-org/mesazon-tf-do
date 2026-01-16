@@ -11,5 +11,5 @@ on:
       - 'README.md'
 jobs:
   tf-fmt:
-    uses: ./.github/workflows/terraform-ci.yml
+    uses: ./.github/workflows/tf-fmt.yml
     secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
