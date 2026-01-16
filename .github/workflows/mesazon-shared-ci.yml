@@ -10,20 +10,16 @@ on:
       - 'mesazon-shared/**'
       - 'modules/**'
 jobs:
-  tf-plan-mesazon-dev:
+  tf-plan-dev:
     uses: ./.github/workflows/tf-plan.yml
     secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
     with:
-      module-dir: "mesazon-shared/environments"
-      org: "mesazon"
-      project: "mesazon-dev"
+      module: "mesazon-shared"
       env: "dev"
-  tf-apply-mesazon-dev:
-    needs: [ "tf-plan-mesazon-dev" ]
+  tf-apply-dev:
+    needs: [ "tf-plan-dev" ]
     uses: ./.github/workflows/tf-apply.yml
     secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
     with:
-      module-dir: "mesazon-shared/environments"
-      org: "mesazon"
-      project: "mesazon-dev"
+      module: "mesazon-shared"
       env: "dev"

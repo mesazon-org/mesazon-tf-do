@@ -1,8 +1,8 @@
-name: terraform-plan
+name: tf-fmt
 on: [ workflow_call ]
 jobs:
   build:
-    name: Terraform fmt for ${{ inputs.project }}
+    name: tf-fmt
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

@@ -1,17 +1,9 @@
-name: terraform-plan
+name: tf-plan
 on:
   workflow_call:
     inputs:
-      module-dir:
-        description: "Module directory"
-        type: string
-        required: true
-      org:
-        description: "Organization name"
-        type: string
-        required: true
-      project:
-        description: "Project name 'mesazon-dev, mesazon-prod, etc'"
+      module:
+        description: "Module name"
         type: string
         required: true
       env:
@@ -22,14 +14,13 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   TF_VAR_do_token: ${{ secrets.DIGITALOCEAN_API_KEY }}
-  TF_VAR_env: ${{ inputs.env }}
 jobs:
   build:
-    name: Terraform plan for ${{ inputs.project }}
+    name: ${{ inputs.module }}-{{ inputs.env }}-tf-plan
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ inputs.module-dir }}/${{ inputs.env }}
+        working-directory: ${{ inputs.module }}/environments/${{ inputs.env }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -39,7 +30,11 @@ jobs:
           terraform_version: 1.14.3
       - name: Terraform Init
         id: init
-        run: terraform init
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.DO_SPACES_BUCKET }}" \
+            -backend-config="key=${{ input.module }}-${{ input.env }}-tf-state/terraform.tfstate" \
+            -backend-config="endpoint=https://${{ secrets.DO_SPACES_REGION }}.digitaloceanspaces.com"
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color -input=false
@@ -50,7 +45,7 @@ jobs:
         env:
           PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.MESAZON_GITHUB_TOKEN }}
           script: |
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
