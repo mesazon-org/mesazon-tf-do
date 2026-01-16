@@ -31,7 +31,7 @@ jobs:
         run: |
           terraform init \
             -backend-config="bucket=${{ secrets.DO_SPACES_BUCKET }}" \
-            -backend-config="key=${{ input.module }}-${{ input.env }}-tf-state/terraform.tfstate" \
+            -backend-config="key=${{ inputs.module }}-${{ inputs.env }}-tf-state/terraform.tfstate" \
             -backend-config="endpoint=https://${{ secrets.DO_SPACES_REGION }}.digitaloceanspaces.com"
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false

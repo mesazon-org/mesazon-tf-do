@@ -33,7 +33,7 @@ jobs:
         run: |
           terraform init \
             -backend-config="bucket=${{ secrets.DO_SPACES_BUCKET }}" \
-            -backend-config="key=${{ input.module }}-${{ input.env }}-tf-state/terraform.tfstate" \
+            -backend-config="key=${{ inputs.module }}-${{ inputs.env }}-tf-state/terraform.tfstate" \
             -backend-config="endpoint=https://${{ secrets.DO_SPACES_REGION }}.digitaloceanspaces.com"
       - name: Terraform Plan
         id: plan
@@ -45,7 +45,7 @@ jobs:
         env:
           PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
-          github-token: ${{ secrets.MESAZON_GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
