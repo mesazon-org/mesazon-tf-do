@@ -34,7 +34,7 @@ jobs:
           terraform init \
             -backend-config="bucket=${{ secrets.DO_SPACES_BUCKET }}" \
             -backend-config="key=${{ inputs.module }}-${{ inputs.env }}-tf-state/terraform.tfstate" \
-            -backend-config="endpoints={s3="https://${{ secrets.DO_SPACES_REGION }}.digitaloceanspaces.com"}"
+            -backend-config="endpoints={s3=\"https://${{ secrets.DO_SPACES_REGION }}.digitaloceanspaces.com\"}"
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color -input=false
