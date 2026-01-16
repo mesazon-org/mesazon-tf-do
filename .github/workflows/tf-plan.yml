@@ -16,7 +16,7 @@ env:
   TF_VAR_do_token: ${{ secrets.DIGITALOCEAN_API_KEY }}
 jobs:
   build:
-    name: ${{ inputs.module }}-${{ inputs.env }}-tf-plan
+    name: tf-plan
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -34,7 +34,7 @@ jobs:
           terraform init \
             -backend-config="bucket=${{ secrets.DO_SPACES_BUCKET }}" \
             -backend-config="key=${{ inputs.module }}-${{ inputs.env }}-tf-state/terraform.tfstate" \
-            -backend-config="endpoints.s3=https://${{ secrets.DO_SPACES_REGION }}.digitaloceanspaces.com"
+            -backend-config="backend.endpoints.s3=https://${{ secrets.DO_SPACES_REGION }}.digitaloceanspaces.com"
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color -input=false

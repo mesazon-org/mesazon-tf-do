@@ -1,4 +1,4 @@
-name: Mesazon TF CI
+name: mesazon-tf-ci
 on:
   push:
     branches: [ main ]

@@ -17,7 +17,7 @@ env:
 jobs:
   build:
     environment: manual_approval
-    name: ${{ inputs.module }}-${{ inputs.env }}-tf-apply
+    name: tf-apply
     runs-on: ubuntu-latest
     defaults:
       run:
