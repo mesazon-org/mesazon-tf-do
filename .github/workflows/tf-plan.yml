@@ -2,12 +2,12 @@ name: tf-plan
 on:
   workflow_call:
     inputs:
-      module:
-        description: "Module name"
+      working-directory:
+        description: "Working directory"
         type: string
         required: true
-      env:
-        description: "Environment 'dev, prod, etc'"
+      bucket-key:
+        description: "Usually module name + environment (mesazon-shared-dev, etc)"
         type: string
         required: true
 env:
@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ inputs.module }}/environments/${{ inputs.env }}
+        working-directory: ${{ inputs.working-directory }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -33,7 +33,7 @@ jobs:
         run: |
           terraform init \
             -backend-config="bucket=${{ secrets.DO_SPACES_BUCKET }}" \
-            -backend-config="key=${{ inputs.module }}-${{ inputs.env }}-tf-state/terraform.tfstate" \
+            -backend-config="key=${{ inputs.bucket-key }}-tf-state/terraform.tfstate" \
             -backend-config="endpoints={s3=\"https://${{ secrets.DO_SPACES_REGION }}.digitaloceanspaces.com\"}"
       - name: Terraform Plan
         id: plan

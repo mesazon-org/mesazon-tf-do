@@ -7,13 +7,6 @@ terraform {
   }
 
   backend "s3" {
-    endpoints = {
-      s3 = "https://fra1.digitaloceanspaces.com"
-    }
-
-    bucket = "mesazon-tf-state"
-    key    = "tf-state-{{ var.env }}/terraform.tfstate"
-
     # Deactivate a few AWS-specific checks
     skip_credentials_validation = true
     skip_requesting_account_id  = true
