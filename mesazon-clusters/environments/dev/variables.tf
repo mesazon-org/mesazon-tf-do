@@ -9,6 +9,6 @@ variable "project_id" {
 }
 
 variable "environment" {
-  type = string
+  type    = string
   default = "dev"
 }

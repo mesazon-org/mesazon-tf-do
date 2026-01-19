@@ -1,7 +1,7 @@
 module "gateway-pg-cluster" {
   source = "../../../modules/postgresql"
 
-  project_id = var.project_id
+  project_id  = var.project_id
   environment = var.environment
 
   cluster_name       = "gateway-dev"
