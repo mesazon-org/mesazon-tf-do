@@ -1,11 +1,11 @@
 variable "registry_name" {
-  type     = string
+  type = string
 }
 
 variable "subscription_tier" {
-  type     = string
+  type = string
 }
 
 variable "region" {
-  type     = string
+  type = string
 }
