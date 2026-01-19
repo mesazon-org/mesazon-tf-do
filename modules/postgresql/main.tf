@@ -25,7 +25,7 @@ resource "digitalocean_database_db" "app_db" {
 
 resource "digitalocean_database_connection_pool" "pg_pool" {
   cluster_id = digitalocean_database_cluster.mesazon_dev_pg_cluster.id
-  name       = var.cluster_name + "-pool-01"
+  name       = "${var.cluster_name}-pool-01"
   mode       = var.connection_pool_mode
   size       = var.connection_pool_size
   db_name    = digitalocean_database_db.app_db.name
