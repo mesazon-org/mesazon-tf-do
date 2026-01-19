@@ -1,4 +1,4 @@
-module "mesaon-registry" {
+module "mesazon-registry" {
   source = "../modules/container-registry"
 
   registry_name     = "mesazon"

@@ -1,11 +1,14 @@
 variable "registry_name" {
-  type = string
+  type     = string
+  required = true
 }
 
 variable "subscription_tier" {
-  type = string
+  type     = string
+  required = true
 }
 
 variable "region" {
-  type = string
+  type     = string
+  required = true
 }

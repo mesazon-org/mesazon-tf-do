@@ -1,0 +1,12 @@
+module "gateway-pg-cluster" {
+  source = "../../../modules/postgresql"
+
+  project_id = var.project_id
+
+  cluster_name       = "gateway-dev"
+  cluster_size       = "db-s-1vcpu-1gb"
+  cluster_region     = "fra1"
+  cluster_node_count = 1
+
+  database = "gateway_db"
+}
