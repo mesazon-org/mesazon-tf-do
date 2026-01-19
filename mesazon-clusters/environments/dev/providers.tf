@@ -4,6 +4,11 @@ terraform {
       source  = "digitalocean/digitalocean"
       version = "~> 2.0"
     }
+
+    postgresql = {
+      source  = "cyrilgdn/postgresql"
+      version = "~> 1.21.0"
+    }
   }
 
   backend "s3" {

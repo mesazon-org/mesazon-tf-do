@@ -7,7 +7,7 @@ terraform {
   }
 }
 
-resource "digitalocean_database_cluster" "mesazon_dev_pg_cluster" {
+resource "digitalocean_database_cluster" "pg_cluster" {
   name       = var.cluster_name
   engine     = "pg"
   version    = var.cluster_version
@@ -18,22 +18,22 @@ resource "digitalocean_database_cluster" "mesazon_dev_pg_cluster" {
   project_id = var.project_id
 }
 
-resource "digitalocean_database_db" "app_db" {
-  cluster_id = digitalocean_database_cluster.mesazon_dev_pg_cluster.id
+resource "digitalocean_database_db" "pg_db" {
+  cluster_id = digitalocean_database_cluster.pg_cluster.id
   name       = var.database
 }
 
 resource "digitalocean_database_connection_pool" "pg_pool" {
-  cluster_id = digitalocean_database_cluster.mesazon_dev_pg_cluster.id
+  cluster_id = digitalocean_database_cluster.pg_cluster.id
   name       = "${var.cluster_name}-pool-01"
   mode       = var.connection_pool_mode
   size       = var.connection_pool_size
-  db_name    = digitalocean_database_db.app_db.name
+  db_name    = digitalocean_database_db.pg_db.name
   user       = "doadmin"
 }
 
 resource "digitalocean_database_postgresql_config" "pg_config" {
-  cluster_id                          = digitalocean_database_cluster.mesazon_dev_pg_cluster.id
+  cluster_id                          = digitalocean_database_cluster.pg_cluster.id
   timezone                            = var.timezone
   idle_in_transaction_session_timeout = var.idle_in_transaction_session_timeout
   log_min_duration_statement          = var.log_min_duration_statement

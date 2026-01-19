@@ -10,5 +10,5 @@ variable "project_id" {
 
 variable "environment" {
   type    = string
-  default = "dev"
+  default = "mesazon-dev"
 }
