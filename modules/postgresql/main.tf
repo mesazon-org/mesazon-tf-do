@@ -10,7 +10,7 @@ terraform {
 resource "digitalocean_database_cluster" "mesazon_dev_pg_cluster" {
   name       = var.cluster_name
   engine     = "pg"
-  version    = "18"
+  version    = var.cluster_version
   size       = var.cluster_size
   region     = var.cluster_region
   node_count = var.cluster_node_count

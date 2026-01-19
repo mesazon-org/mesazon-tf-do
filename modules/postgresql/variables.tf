@@ -14,6 +14,12 @@ variable "cluster_size" {
   description = "Droplet size slug (e.g., db-s-1vcpu-1gb)."
 }
 
+variable "cluster_version" {
+  type        = string
+  default     = "18"
+  description = "PostgreSQL major version (e.g., 18, 17, 16)."
+}
+
 variable "cluster_node_count" {
   type        = number
   default     = 1
