@@ -14,7 +14,7 @@ terraform {
 
 provider "postgresql" {
   host            = digitalocean_database_cluster.pg_cluster.host
-  port            = digitalocean_database_cluster.pg_cluster.host
+  port            = digitalocean_database_cluster.pg_cluster.port
   database        = var.database
   username        = digitalocean_database_cluster.pg_cluster.user
   password        = digitalocean_database_cluster.pg_cluster.password
@@ -24,7 +24,7 @@ provider "postgresql" {
 }
 
 resource "digitalocean_database_cluster" "pg_cluster" {
-  name       = "${var.cluster_name}-${var.environment}-${var.cluster_region}"
+  name       = "${var.cluster_name}-${var.cluster_region}-${var.environment}"
   engine     = "pg"
   version    = var.cluster_version
   size       = var.cluster_size
@@ -67,35 +67,4 @@ resource "digitalocean_database_postgresql_config" "pg_config" {
   log_min_duration_statement          = var.log_min_duration_statement
 
   depends_on = [digitalocean_database_cluster.pg_cluster]
-}
-
-resource "digitalocean_database_user" "flyway_user" {
-  cluster_id = digitalocean_database_cluster.pg_cluster.id
-  name       = "flyway_user"
-
-  depends_on = [digitalocean_database_cluster.pg_cluster]
-}
-
-resource "postgresql_role" "flyway_group" {
-  name  = "flyway_group"
-  login = false
-
-  depends_on = [digitalocean_database_cluster.pg_cluster]
-}
-
-resource "postgresql_grant" "flyway_schema_usage" {
-  role        = postgresql_role.flyway_group.name
-  database    = var.database
-  schema      = "public"
-  object_type = "schema"
-  privileges  = ["CREATE", "USAGE"]
-
-  depends_on = [digitalocean_database_user.flyway_user]
-}
-
-resource "postgresql_grant_role" "flyway_assignment" {
-  role       = digitalocean_database_user.flyway_user.name
-  grant_role = postgresql_role.flyway_group.name
-
-  depends_on = [digitalocean_database_user.flyway_user, postgresql_role.flyway_group]
 }

@@ -15,12 +15,17 @@ terraform {
 provider "postgresql" {
   host            = var.host
   port            = var.port
-  database        = "defaultdb" # Connect to default to manage roles
+  database        = var.database
   username        = var.username
   password        = var.password
   superuser       = false
   sslmode         = "require"
   connect_timeout = 15
+}
+
+resource "postgresql_schema" "database_schema" {
+  name  = var.schema
+  owner = "postgres"
 }
 
 resource "digitalocean_database_user" "database_user" {
@@ -33,10 +38,10 @@ resource "postgresql_role" "user_group" {
   login = false
 }
 
-resource "postgresql_grant" "flyway_schema_usage" {
+resource "postgresql_grant" "user_schema_usage" {
   role        = postgresql_role.user_group.name
-  database    = var.database_name
-  schema      = var.schema_name
+  database    = var.database
+  schema      = postgresql_schema.database_schema.name
   object_type = "schema"
   privileges  = ["SELECT", "INSERT", "UPDATE", "DELETE"]
 }
@@ -44,4 +49,42 @@ resource "postgresql_grant" "flyway_schema_usage" {
 resource "postgresql_grant_role" "user_assignment" {
   role       = digitalocean_database_user.database_user.name
   grant_role = postgresql_role.user_group.name
+}
+
+// Flyway user
+resource "digitalocean_database_user" "flyway_user" {
+  cluster_id = var.cluster_id
+  name       = "${var.user}_flyway_user"
+}
+
+resource "postgresql_role" "flyway_group" {
+  name  = "${var.user}_flyway_group"
+  login = false
+}
+
+resource "postgresql_grant" "flyway_schema_usage" {
+  role        = postgresql_role.flyway_group.name
+  database    = var.database
+  schema      = postgresql_schema.database_schema.name
+  object_type = "schema"
+  privileges  = ["CREATE", "USAGE"]
+
+  depends_on = [digitalocean_database_user.flyway_user]
+}
+
+resource "postgresql_grant" "flyway_schema_usage" {
+  role        = postgresql_role.flyway_group.name
+  database    = var.database
+  schema      = "public"
+  object_type = "schema"
+  privileges  = ["CREATE", "USAGE"]
+
+  depends_on = [digitalocean_database_user.flyway_user]
+}
+
+resource "postgresql_grant_role" "flyway_assignment" {
+  role       = digitalocean_database_user.flyway_user.name
+  grant_role = postgresql_role.flyway_group.name
+
+  depends_on = [digitalocean_database_user.flyway_user, postgresql_role.flyway_group]
 }

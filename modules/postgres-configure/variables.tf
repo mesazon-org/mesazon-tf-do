@@ -30,12 +30,12 @@ variable "user" {
   description = "Database user to create"
 }
 
-variable "schema_name" {
+variable "database" {
   type        = string
-  description = "Schema name to create."
+  description = "Database name."
 }
 
-variable "database_name" {
+variable "schema" {
   type        = string
-  description = "Database name to create."
+  description = "Schema name to create."
 }
