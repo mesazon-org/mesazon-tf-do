@@ -23,25 +23,25 @@ provider "postgresql" {
   connect_timeout = 15
 }
 
-resource "digitalocean_database_user" "flyway_user" {
+resource "digitalocean_database_user" "database_user" {
   cluster_id = var.cluster_id
-  name       = "flyway_user"
+  name       = var.user
 }
 
-resource "postgresql_role" "flyway_group" {
-  name  = "flyway_group"
+resource "postgresql_role" "user_group" {
+  name  = "${var.user}_group"
   login = false
 }
 
 resource "postgresql_grant" "flyway_schema_usage" {
-  role        = postgresql_role.flyway_group.name
-  database    = var.database
-  schema      = "public"
+  role        = postgresql_role.user_group.name
+  database    = var.database_name
+  schema      = var.schema_name
   object_type = "schema"
-  privileges  = ["CREATE", "USAGE"]
+  privileges  = ["SELECT", "INSERT", "UPDATE", "DELETE"]
 }
 
-resource "postgresql_grant_role" "flyway_assignment" {
-  role       = digitalocean_database_user.flyway_user.name
-  grant_role = postgresql_role.flyway_group.name
+resource "postgresql_grant_role" "user_assignment" {
+  role       = digitalocean_database_user.database_user.name
+  grant_role = postgresql_role.user_group.name
 }

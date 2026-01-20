@@ -25,7 +25,17 @@ variable "password" {
   sensitive   = true
 }
 
-variable "database" {
+variable "user" {
+  type        = string
+  description = "Database user to create"
+}
+
+variable "schema_name" {
+  type        = string
+  description = "Schema name to create."
+}
+
+variable "database_name" {
   type        = string
   description = "Database name to create."
 }
