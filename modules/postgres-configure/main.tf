@@ -38,7 +38,7 @@ resource "postgresql_role" "user_group" {
   login = false
 }
 
-resource "postgresql_grant" "user_schema_usage" {
+resource "postgresql_grant" "user_provided_schema_usage" {
   role        = postgresql_role.user_group.name
   database    = var.database
   schema      = postgresql_schema.database_schema.name
@@ -62,7 +62,7 @@ resource "postgresql_role" "flyway_group" {
   login = false
 }
 
-resource "postgresql_grant" "flyway_schema_usage" {
+resource "postgresql_grant" "flyway_provided_schema_usage" {
   role        = postgresql_role.flyway_group.name
   database    = var.database
   schema      = postgresql_schema.database_schema.name
@@ -72,7 +72,7 @@ resource "postgresql_grant" "flyway_schema_usage" {
   depends_on = [digitalocean_database_user.flyway_user]
 }
 
-resource "postgresql_grant" "flyway_schema_usage" {
+resource "postgresql_grant" "flyway_public_schema_usage" {
   role        = postgresql_role.flyway_group.name
   database    = var.database
   schema      = "public"
