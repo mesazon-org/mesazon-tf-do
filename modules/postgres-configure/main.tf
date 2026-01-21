@@ -25,7 +25,7 @@ provider "postgresql" {
 
 resource "postgresql_schema" "database_schema" {
   name  = var.schema
-  owner = "postgres"
+  owner = var.username
 }
 
 resource "digitalocean_database_user" "database_user" {
