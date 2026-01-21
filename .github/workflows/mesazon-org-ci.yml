@@ -1,0 +1,27 @@
+name: mesazon-org-ci
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'mesazon-org/**'
+      - 'modules/**'
+  pull_request:
+    paths:
+      - 'mesazon-org/**'
+      - 'modules/**'
+jobs:
+  mesazon-org-tf-plan:
+    uses: ./.github/workflows/tf-plan.yml
+    secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
+    with:
+      project-id: "" # Not used in mesazon-org
+      working-directory: "mesazon-org"
+      bucket-key: "mesazon-org"
+  mesazon-org-tf-apply:
+    needs: [ "mesazon-org-tf-plan" ]
+    uses: ./.github/workflows/tf-apply.yml
+    secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
+    with:
+      project-id: "" # Not used in mesazon-org
+      working-directory: "mesazon-org"
+      bucket-key: "mesazon-org"

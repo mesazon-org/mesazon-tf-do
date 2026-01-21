@@ -1,0 +1,27 @@
+name: mesazon-clusters-ci
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'mesazon-clusters/**'
+      - 'modules/**'
+  pull_request:
+    paths:
+      - 'mesazon-clusters/**'
+      - 'modules/**'
+jobs:
+  mesazon-clusters-dev-tf-plan:
+    uses: ./.github/workflows/tf-plan.yml
+    secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
+    with:
+      project-id: "8a8c246e-2057-46b7-a01a-04cbbbf0b8d9"
+      working-directory: "mesazon-clusters/environments/dev"
+      bucket-key: "mesazon-clusters-dev"
+  mesazon-clusters-dev-tf-apply:
+    needs: [ "mesazon-clusters-dev-tf-plan" ]
+    uses: ./.github/workflows/tf-apply.yml
+    secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
+    with:
+      project-id: "8a8c246e-2057-46b7-a01a-04cbbbf0b8d9"
+      working-directory: "mesazon-clusters/environments/dev"
+      bucket-key: "mesazon-clusters-dev"
