@@ -50,13 +50,22 @@ resource "postgresql_role" "user_group" {
   login = false
 }
 
-resource "postgresql_grant" "user_provided_schema_usage" {
+resource "postgresql_default_privileges" "user_group_tables" {
   role        = postgresql_role.user_group.name
   database    = var.database
   schema      = postgresql_schema.database_schema.name
-  object_type = "schema"
+  owner       = postgresql_role.user_group.name
+  object_type = "table"
   privileges  = ["SELECT", "INSERT", "UPDATE", "DELETE"]
 }
+
+# resource "postgresql_grant" "user_provided_schema_usage" {
+#   role        = postgresql_role.user_group.name
+#   database    = var.database
+#   schema      = postgresql_schema.database_schema.name
+#   object_type = "schema"
+#   privileges  = ["SELECT", "INSERT", "UPDATE", "DELETE"]
+# }
 
 resource "postgresql_grant_role" "user_assignment" {
   role       = digitalocean_database_user.database_user.name
