@@ -27,17 +27,6 @@ resource "postgresql_schema" "database_schema" {
   name          = var.schema
   owner         = postgresql_role.user_group.name
   if_not_exists = true
-
-  policy {
-    usage = true
-    role  = postgresql_role.user_group.name
-  }
-
-  policy {
-    create = true
-    usage  = true
-    role   = postgresql_role.flyway_group.name
-  }
 }
 
 resource "digitalocean_database_user" "database_user" {
