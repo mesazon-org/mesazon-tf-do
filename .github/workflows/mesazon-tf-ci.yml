@@ -6,7 +6,7 @@ on:
       - '.gitignore'
       - 'README.md'
   pull_request:
-    paths:
+    paths-ignore:
       - '.gitignore'
       - 'README.md'
 jobs:

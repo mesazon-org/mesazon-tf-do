@@ -18,7 +18,7 @@ jobs:
     with:
       project-id: "" # Not used in mesazon-org
       working-directory: "mesazon-org"
-      bucket-key: "mesazon-org"
+      module: "mesazon-org"
   mesazon-org-tf-apply:
     needs: [ "mesazon-org-tf-plan" ]
     if: github.ref == 'refs/heads/main'
@@ -27,5 +27,5 @@ jobs:
     with:
       project-id: "" # Not used in mesazon-org
       working-directory: "mesazon-org"
-      bucket-key: "mesazon-org"
+      module: "mesazon-org"
       environment: "prod"

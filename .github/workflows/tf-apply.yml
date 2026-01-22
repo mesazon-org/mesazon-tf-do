@@ -10,7 +10,7 @@ on:
         description: "Working directory"
         type: string
         required: true
-      bucket-key:
+      module:
         description: "Usually module name + environment (mesazon-shared-dev, etc)"
         type: string
         required: true
@@ -43,7 +43,7 @@ jobs:
         run: |
           terraform init \
             -backend-config="bucket=${{ secrets.DO_SPACES_BUCKET }}" \
-            -backend-config="key=${{ inputs.bucket-key }}-tf-state/terraform.tfstate" \
+            -backend-config="key=${{ inputs.module }}-tf-state/terraform.tfstate" \
             -backend-config="endpoints={s3=\"https://${{ secrets.DO_SPACES_REGION }}.digitaloceanspaces.com\"}"
       - name: Terraform Apply
         run: terraform apply -auto-approve -input=false
