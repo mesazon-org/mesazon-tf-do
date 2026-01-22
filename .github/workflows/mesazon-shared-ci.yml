@@ -18,7 +18,7 @@ jobs:
     with:
       project-id: "" # Not used in mesazon-shared
       working-directory: "mesazon-shared"
-      bucket-key: "mesazon-shared"
+      module: "mesazon-shared"
   mesazon-shared-tf-apply:
     needs: [ "mesazon-shared-tf-plan" ]
     if: github.ref == 'refs/heads/main'
@@ -27,5 +27,5 @@ jobs:
     with:
       project-id: "" # Not used in mesazon-shared
       working-directory: "mesazon-shared"
-      bucket-key: "mesazon-shared"
+      module: "mesazon-shared"
       environment: "prod"

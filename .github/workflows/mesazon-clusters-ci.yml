@@ -18,7 +18,7 @@ jobs:
     with:
       project-id: "8a8c246e-2057-46b7-a01a-04cbbbf0b8d9"
       working-directory: "mesazon-clusters/environments/dev"
-      bucket-key: "mesazon-clusters-dev"
+      module: "mesazon-clusters-dev"
 
   mesazon-clusters-dev-tf-apply:
     needs: [ "mesazon-clusters-dev-tf-plan" ]
@@ -27,7 +27,7 @@ jobs:
     with:
       project-id: "8a8c246e-2057-46b7-a01a-04cbbbf0b8d9"
       working-directory: "mesazon-clusters/environments/dev"
-      bucket-key: "mesazon-clusters-dev"
+      module: "mesazon-clusters-dev"
       environment: "dev"
 
 # Example of how to add prod environment deployment after dev is successful
@@ -39,7 +39,7 @@ jobs:
 #    with:
 #      project-id: "8a8c246e-2057-46b7-a01a-04cbbbf0b8d8"
 #      working-directory: "mesazon-clusters/environments/prod"
-#      bucket-key: "mesazon-clusters-prod"
+#      module: "mesazon-clusters-prod"
 #
 #  mesazon-clusters-prod-tf-apply:
 #    needs: [ "mesazon-clusters-prod-tf-plan" ]
@@ -49,5 +49,5 @@ jobs:
 #    with:
 #      project-id: "8a8c246e-2057-46b7-a01a-04cbbbf0b8d8"
 #      working-directory: "mesazon-clusters/environments/prod"
-#      bucket-key: "mesazon-clusters-prod"
+#      module: "mesazon-clusters-prod"
 #      environment: "prod"
