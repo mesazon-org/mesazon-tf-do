@@ -3,10 +3,12 @@ on:
   push:
     branches: [ main ]
     paths:
+      - ".github/**"
       - 'mesazon-shared/**'
       - 'modules/**'
   pull_request:
     paths:
+      - ".github/**"
       - 'mesazon-shared/**'
       - 'modules/**'
 jobs:
