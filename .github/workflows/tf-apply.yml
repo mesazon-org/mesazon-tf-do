@@ -25,7 +25,7 @@ env:
   TF_VAR_project_id: ${{ inputs.project-id }}
 jobs:
   build:
-    environment: ${{ in.event_name == 'pull_request' && 'production' || inputs.environment }}
+    environment: ${{ in.event_name == 'pull_request' && 'pull-request-manual-approval' || inputs.environment }}
     name: tf-apply
     runs-on: ubuntu-latest
     defaults:
