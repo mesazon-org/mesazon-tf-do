@@ -21,9 +21,11 @@ jobs:
       bucket-key: "mesazon-org"
   mesazon-org-tf-apply:
     needs: [ "mesazon-org-tf-plan" ]
+    if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/tf-apply.yml
     secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
     with:
       project-id: "" # Not used in mesazon-org
       working-directory: "mesazon-org"
       bucket-key: "mesazon-org"
+      environment: "prod"
