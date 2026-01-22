@@ -14,6 +14,10 @@ on:
         description: "Usually module name + environment (mesazon-shared-dev, etc)"
         type: string
         required: true
+      environment:
+        description: "Deployment environment name"
+        type: string
+        required: false
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -21,7 +25,7 @@ env:
   TF_VAR_project_id: ${{ inputs.project-id }}
 jobs:
   build:
-    environment: ${{ github.event_name == 'pull_request' && 'manual_approval' || '' }}
+    environment: ${{ in.event_name == 'pull_request' && 'production' || inputs.environment }}
     name: tf-apply
     runs-on: ubuntu-latest
     defaults:
