@@ -22,7 +22,7 @@ resource "digitalocean_droplet" "web" {
   ssh_keys = [for k in digitalocean_ssh_key.team : k.fingerprint]
 }
 
-resource "digitalocean_project_resources" "barfoo" {
+resource "digitalocean_project_resources" "project_resources" {
   project = var.project_id
   resources = [
     digitalocean_droplet.web.urn
