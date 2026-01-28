@@ -1,7 +1,7 @@
 module "mesazon-droplet" {
   source = "../../../modules/droplet"
 
-  project_id = var.project_id
+  project_id  = var.project_id
   environment = var.environment
 
   name   = "mesazon"
