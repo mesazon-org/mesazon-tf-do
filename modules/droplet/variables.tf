@@ -3,6 +3,12 @@ variable "project_id" {
   description = "DigitalOcean Project ID assignment"
 }
 
+variable "do_ssh_private_key" {
+  description = "DigitalOcean SSH Private Key"
+  type        = string
+  sensitive   = true
+}
+
 variable "team_members" {
   description = "Map of usernames and their SSH public keys"
   type        = map(string)

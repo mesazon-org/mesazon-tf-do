@@ -4,6 +4,12 @@ variable "do_token" {
   sensitive   = true
 }
 
+variable "do_ssh_private_key" {
+  description = "DigitalOcean SSH Private Key"
+  type        = string
+  sensitive   = true
+}
+
 variable "project_id" {
   type = string
 }
