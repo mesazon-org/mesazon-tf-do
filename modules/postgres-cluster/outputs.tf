@@ -10,8 +10,8 @@ output "port" {
   value = digitalocean_database_cluster.pg_cluster.port
 }
 
-output "username" {
-  value = "doadmin"
+output "user" {
+  value = digitalocean_database_cluster.pg_cluster.user
 }
 
 output "password" {

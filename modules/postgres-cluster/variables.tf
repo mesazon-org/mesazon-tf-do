@@ -1,9 +1,19 @@
-variable "cluster_name" {
+variable "project_id" {
+  type        = string
+  description = "DigitalOcean Project ID assignment."
+}
+
+variable "environment" {
+  type        = string
+  description = "Environment name for tagging (dev, prod)."
+}
+
+variable "cluster_name_raw" {
   type        = string
   description = "Cluster name in DigitalOcean dashboard."
 }
 
-variable "database" {
+variable "database_raw" {
   type        = string
   description = "Logical database name used in connection strings."
 }
@@ -29,11 +39,6 @@ variable "cluster_node_count" {
 variable "cluster_region" {
   type        = string
   description = "DigitalOcean region slug (e.g., nyc1)."
-}
-
-variable "project_id" {
-  type        = string
-  description = "DigitalOcean Project ID assignment."
 }
 
 variable "connection_pool_mode" {
@@ -64,9 +69,4 @@ variable "log_min_duration_statement" {
   type        = string
   default     = "1000"
   description = "Slow query log threshold in ms."
-}
-
-variable "environment" {
-  type        = string
-  description = "Environment name for tagging (dev, prod)."
 }

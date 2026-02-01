@@ -1,7 +1,7 @@
 module "mesazon-registry" {
   source = "../modules/container-registry"
 
-  registry_name     = "mesazon"
+  registry_name_raw = "mesazon"
   subscription_tier = "basic"
-  region            = "fra1"
+  region            = local.region
 }

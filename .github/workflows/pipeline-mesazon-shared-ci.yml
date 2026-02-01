@@ -13,7 +13,7 @@ on:
       - 'modules/**'
 jobs:
   mesazon-shared-tf-plan:
-    uses: ./.github/workflows/tf-plan.yml
+    uses: ./.github/workflows/job-tf-plan.yml
     secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
     with:
       project-id: "" # Not used in mesazon-shared
@@ -21,8 +21,8 @@ jobs:
       module: "mesazon-shared"
   mesazon-shared-tf-apply:
     needs: [ "mesazon-shared-tf-plan" ]
-    if: github.ref == 'refs/heads/main'
-    uses: ./.github/workflows/tf-apply.yml
+    if: github.ref == 'refs/heads/main' && needs.mesazon-shared-tf-plan.outputs.changes-detected == 'true'
+    uses: ./.github/workflows/job-tf-apply.yml
     secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
     with:
       project-id: "" # Not used in mesazon-shared
