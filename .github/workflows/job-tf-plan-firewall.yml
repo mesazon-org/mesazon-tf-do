@@ -83,7 +83,7 @@ jobs:
           -target=${{ inputs.firewall-module }}
       - name: Update pull request
         uses: actions/github-script@v7
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode != 0
         env:
           PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
