@@ -79,8 +79,9 @@ jobs:
           fi
       - name: Terraform destroy firewall
         run: |
-          terraform destroy -auto-approve -input=false \
+          terraform apply -auto-approve -input=false \
           -target=${{ inputs.firewall-module }}
+          -var="disable_runner_ip=true"
       - name: Update pull request
         uses: actions/github-script@v7
         if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode != 0

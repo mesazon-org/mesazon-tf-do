@@ -65,8 +65,9 @@ jobs:
         continue-on-error: true
       - name: Terraform destroy firewall
         run: |
-          terraform destroy -auto-approve -input=false \
+          terraform apply -auto-approve -input=false \
           -target=${{ inputs.firewall-module }}
+          -var="disable_runner_ip=true"
       - name: Terraform apply status
         if: steps.apply.outputs.exitcode == 1
         run: exit 1

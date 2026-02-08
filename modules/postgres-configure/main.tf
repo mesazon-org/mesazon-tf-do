@@ -19,12 +19,14 @@ data "digitalocean_database_cluster" "postgres_cluster" {
 resource "digitalocean_database_firewall" "pg_firewall" {
   cluster_id = data.digitalocean_database_cluster.postgres_cluster.id
 
-  dynamic "rule" {
-    for_each = local.database_firewall_rules
-    content {
-      type  = rule.value.type
-      value = rule.value.value
-    }
+  rule {
+    type  = "ip_addr",
+    value = "127.0.0.1"
+  }
+
+  rule {
+    type  = var.disable_runner_ip ? null : "ip_addr",
+    value = var.disable_runner_ip ? null : var.runner_ip
   }
 }
 

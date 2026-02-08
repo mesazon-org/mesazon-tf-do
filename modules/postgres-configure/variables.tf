@@ -32,3 +32,9 @@ variable "schema_raw" {
   type        = string
   description = "Schema name to create."
 }
+
+variable "disable_runner_ip" {
+    description = "Whether to disable the runner IP in the firewall rules."
+    type        = bool
+    default     = false
+}
