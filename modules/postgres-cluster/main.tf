@@ -57,3 +57,12 @@ resource "digitalocean_database_postgresql_config" "pg_config" {
 
   depends_on = [digitalocean_database_cluster.pg_cluster]
 }
+
+resource "digitalocean_database_firewall" "block_all" {
+  cluster_id = digitalocean_database_cluster.pg_cluster.id
+
+    rule {
+      type  = "tag"
+      value = "block-all"
+    }
+}
