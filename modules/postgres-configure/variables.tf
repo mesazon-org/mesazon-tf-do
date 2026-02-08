@@ -1,41 +1,34 @@
-variable "cluster_id" {
+variable "runner_ip" {
+  description = "GitHub runner IP address to allow in the cluster firewall"
+  type        = string
+}
+
+variable "environment" {
+  type        = string
+  description = "The environment for which to configure the database."
+}
+
+variable "region" {
+  type        = string
+  description = "DigitalOcean region slug (e.g., nyc1)."
+}
+
+variable "cluster_name_raw" {
   type        = string
   description = "Cluster name in DigitalOcean dashboard."
 }
 
-variable "host" {
+variable "database_raw" {
   type        = string
-  description = "Database host."
+  description = "Logical database name used in connection strings."
 }
 
-variable "port" {
-  type        = number
-  description = "Database port."
-  default     = 25060
-}
-
-variable "username" {
+variable "user_raw" {
   type        = string
   description = "Database user to create."
 }
 
-variable "password" {
-  type        = string
-  description = "Database user password."
-  sensitive   = true
-}
-
-variable "user" {
-  type        = string
-  description = "Database user to create"
-}
-
-variable "database" {
-  type        = string
-  description = "Database name."
-}
-
-variable "schema" {
+variable "schema_raw" {
   type        = string
   description = "Schema name to create."
 }

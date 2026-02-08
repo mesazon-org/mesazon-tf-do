@@ -1,4 +1,4 @@
-variable "registry_name" {
+variable "registry_name_raw" {
   type = string
 }
 

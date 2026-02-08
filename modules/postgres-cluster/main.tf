@@ -4,34 +4,23 @@ terraform {
       source  = "digitalocean/digitalocean"
       version = "~> 2.0"
     }
-
-    postgresql = {
-      source  = "cyrilgdn/postgresql"
-      version = "~> 1.21.0"
-    }
   }
 }
 
-provider "postgresql" {
-  host            = digitalocean_database_cluster.pg_cluster.host
-  port            = digitalocean_database_cluster.pg_cluster.port
-  database        = var.database
-  username        = digitalocean_database_cluster.pg_cluster.user
-  password        = digitalocean_database_cluster.pg_cluster.password
-  superuser       = false
-  sslmode         = "require"
-  connect_timeout = 15
+data "digitalocean_project" "project" {
+  id = var.project_id
 }
 
 resource "digitalocean_database_cluster" "pg_cluster" {
-  name       = "${var.cluster_name}-${var.cluster_region}-${var.environment}"
+  project_id = var.project_id
+
+  name       = local.cluster_name
   engine     = "pg"
   version    = var.cluster_version
   size       = var.cluster_size
   region     = var.cluster_region
   node_count = var.cluster_node_count
-  tags       = [var.environment]
-  project_id = var.project_id
+  tags       = local.common_tags
 
   lifecycle {
     prevent_destroy = true
@@ -40,7 +29,7 @@ resource "digitalocean_database_cluster" "pg_cluster" {
 
 resource "digitalocean_database_db" "pg_db" {
   cluster_id = digitalocean_database_cluster.pg_cluster.id
-  name       = var.database
+  name       = local.database
 
   lifecycle {
     prevent_destroy = true
@@ -51,7 +40,7 @@ resource "digitalocean_database_db" "pg_db" {
 
 resource "digitalocean_database_connection_pool" "pg_pool" {
   cluster_id = digitalocean_database_cluster.pg_cluster.id
-  name       = "${var.cluster_name}-pool-01"
+  name       = local.connection_pool_name
   mode       = var.connection_pool_mode
   size       = var.connection_pool_size
   db_name    = digitalocean_database_db.pg_db.name

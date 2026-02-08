@@ -1,4 +1,4 @@
-name: tf-apply
+name: tf-apply-firewall
 on:
   workflow_call:
     inputs:
@@ -17,16 +17,21 @@ on:
       environment:
         description: "Deployment environment name"
         type: string
-        required: false
+        required: true
+      firewall-module:
+        description: "Firewall module name (Usually module name + environment + firewall, e.g. mesazon-shared-dev-firewall)"
+        type: string
+        required: true
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  TF_VAR_do_token: ${{ secrets.DIGITALOCEAN_API_KEY }}
+  TF_VAR_do_token: ${{ secrets.DO_API_KEY }}
+  TF_VAR_docker_token: ${{ secrets.DOCKER_TOKEN }}
   TF_VAR_project_id: ${{ inputs.project-id }}
 jobs:
   build:
     environment: ${{ github.event_name == 'pull_request' && 'dev_pr' || inputs.environment || 'production' }}
-    name: tf-apply
+    name: tf-apply-firewall
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -34,16 +39,34 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+      - name: Get IP Addresses
+        id: ip
+        uses: candidob/get-runner-ip@v1.0.0
+      - name: Export Runner IP as Environment Variable
+        run: echo "TF_VAR_runner_ip=${{ steps.ip.outputs.ipv4 }}" >> $GITHUB_ENV
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.14.3
-      - name: Terraform Init
+      - name: Terraform init
         id: init
         run: |
           terraform init \
             -backend-config="bucket=${{ secrets.DO_SPACES_BUCKET }}" \
             -backend-config="key=${{ inputs.module }}-tf-state/terraform.tfstate" \
             -backend-config="endpoints={s3=\"https://${{ secrets.DO_SPACES_REGION }}.digitaloceanspaces.com\"}"
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -input=false
+      - name: Terraform apply firewall
+        run: |
+          terraform apply -auto-approve -input=false \
+          -target=${{ inputs.firewall-module }}
+      - name: Terraform apply
+        id: apply
+        run: terraform apply -auto-approve -input=false -detailed-exitcode
+        continue-on-error: true
+      - name: Terraform destroy firewall
+        run: |
+          terraform destroy -auto-approve -input=false \
+          -target=${{ inputs.firewall-module }}
+      - name: Terraform apply status
+        if: steps.apply.outputs.exitcode == 1
+        run: exit 1

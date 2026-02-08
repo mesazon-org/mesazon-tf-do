@@ -1,0 +1,79 @@
+name: mesazon-clusters-ci
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - ".github/**"
+      - 'mesazon-clusters/**'
+      - 'mesazon-clusters-configure/**'
+      - 'modules/**'
+  pull_request:
+    paths:
+      - ".github/**"
+      - 'mesazon-clusters/**'
+      - 'mesazon-clusters-configure/**'
+      - 'modules/**'
+jobs:
+  mesazon-clusters-dev-tf-plan:
+    uses: ./.github/workflows/job-tf-plan.yml
+    secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
+    with:
+      project-id: "5d792a15-cf5f-46c7-ab46-425f64c52ea4"
+      working-directory: "mesazon-clusters/dev"
+      module: "mesazon-clusters-dev"
+
+  mesazon-clusters-dev-tf-apply:
+    needs: [ "mesazon-clusters-dev-tf-plan" ]
+    if: needs.mesazon-clusters-dev-tf-plan.outputs.changes-detected == 'true'
+    uses: ./.github/workflows/job-tf-apply.yml
+    secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
+    with:
+      project-id: "5d792a15-cf5f-46c7-ab46-425f64c52ea4"
+      working-directory: "mesazon-clusters/dev"
+      module: "mesazon-clusters-dev"
+      environment: "dev"
+
+  mesazon-clusters-configure-dev-tf-plan:
+    needs: [ "mesazon-clusters-dev-tf-plan", "mesazon-clusters-dev-tf-apply" ]
+    if: always() && !failure() && !cancelled()
+    uses: ./.github/workflows/job-tf-plan-firewall.yml
+    secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
+    with:
+      firewall-module: "module.gateway_pg_configure.digitalocean_database_firewall.pg_firewall"
+      project-id: "5d792a15-cf5f-46c7-ab46-425f64c52ea4"
+      working-directory: "mesazon-clusters-configure/dev"
+      module: "mesazon-clusters-configure-dev"
+
+  mesazon-clusters-configure-dev-tf-apply:
+    needs: [ "mesazon-clusters-configure-dev-tf-plan" ]
+    if: always() && !failure() && !cancelled() && needs.mesazon-clusters-configure-dev-tf-plan.outputs.changes-detected == 'true'
+    uses: ./.github/workflows/job-tf-apply-firewall.yml
+    secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
+    with:
+      firewall-module: "module.gateway_pg_configure.digitalocean_database_firewall.pg_firewall"
+      project-id: "5d792a15-cf5f-46c7-ab46-425f64c52ea4"
+      working-directory: "mesazon-clusters-configure/dev"
+      module: "mesazon-clusters-configure-dev"
+      environment: "dev"
+
+# Example of how to add prod environment deployment after dev is successful
+#  mesazon-clusters-prod-tf-plan:
+#    needs: [ "mesazon-clusters-dev-tf-apply" ]
+#    if: github.ref == 'refs/heads/main'
+#    uses: ./.github/workflows/job-tf-plan.yml
+#    secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
+#    with:
+#      project-id: "8a8c246e-2057-46b7-a01a-04cbbbf0b8d8"
+#      working-directory: "mesazon-clusters/environments/prod"
+#      module: "mesazon-clusters-prod"
+#
+#  mesazon-clusters-prod-tf-apply:
+#    needs: [ "mesazon-clusters-prod-tf-plan" ]
+#    if: github.ref == 'refs/heads/main'
+#    uses: ./.github/workflows/job-tf-apply.yml
+#    secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
+#    with:
+#      project-id: "8a8c246e-2057-46b7-a01a-04cbbbf0b8d8"
+#      working-directory: "mesazon-clusters/environments/prod"
+#      module: "mesazon-clusters-prod"
+#      environment: "prod"

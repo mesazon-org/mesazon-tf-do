@@ -12,98 +12,121 @@ terraform {
   }
 }
 
+data "digitalocean_database_cluster" "postgres_cluster" {
+  name = local.cluster_name
+}
+
+resource "digitalocean_database_firewall" "pg_firewall" {
+  cluster_id = data.digitalocean_database_cluster.postgres_cluster.id
+
+  rule {
+    type  = "ip_addr"
+    value = var.runner_ip
+  }
+}
+
 provider "postgresql" {
-  host            = var.host
-  port            = var.port
-  database        = var.database
-  username        = var.username
-  password        = var.password
+  host            = data.digitalocean_database_cluster.postgres_cluster.host
+  port            = data.digitalocean_database_cluster.postgres_cluster.port
+  database        = local.database
+  username        = data.digitalocean_database_cluster.postgres_cluster.user
+  password        = data.digitalocean_database_cluster.postgres_cluster.password
   superuser       = false
   sslmode         = "require"
   connect_timeout = 15
 }
 
 resource "postgresql_schema" "database_schema" {
-  name          = var.schema
+  name          = local.schema
   owner         = postgresql_role.user_group.name
   if_not_exists = true
 }
 
+// Provided user & group
 resource "digitalocean_database_user" "database_user" {
-  cluster_id = var.cluster_id
-  name       = var.user
+  cluster_id = data.digitalocean_database_cluster.postgres_cluster.id
+  name       = local.user
 }
 
 resource "postgresql_role" "user_group" {
-  name  = "${var.user}_group"
+  name  = local.user_group
   login = false
 }
 
-resource "postgresql_grant" "user_provided_schema_usage" {
-  role        = postgresql_role.user_group.name
-  database    = var.database
-  schema      = postgresql_schema.database_schema.name
-  object_type = "schema"
-  privileges  = ["USAGE"]
-}
-
-resource "postgresql_default_privileges" "flyway_sequences_to_user" {
-  role        = postgresql_role.user_group.name
-  database    = var.database
-  schema      = postgresql_schema.database_schema.name
-  owner       = digitalocean_database_user.flyway_user.name
-  object_type = "sequence"
-  privileges  = ["USAGE"]
-}
-
-resource "postgresql_default_privileges" "flyway_tables_to_user" {
-  role        = postgresql_role.user_group.name
-  database    = var.database
-  schema      = postgresql_schema.database_schema.name
-  owner       = digitalocean_database_user.flyway_user.name
-  object_type = "table"
-  privileges  = ["SELECT", "INSERT", "UPDATE", "DELETE"]
-}
-
-resource "postgresql_grant_role" "user_assignment" {
-  role       = digitalocean_database_user.database_user.name
-  grant_role = postgresql_role.user_group.name
-}
-
-// Flyway user
+// Flyway user & group
 resource "digitalocean_database_user" "flyway_user" {
-  cluster_id = var.cluster_id
-  name       = "${var.user}_flyway_user"
+  cluster_id = data.digitalocean_database_cluster.postgres_cluster.id
+  name       = local.flyway_user
 }
 
 resource "postgresql_role" "flyway_group" {
-  name  = "${var.user}_flyway_group"
+  name  = local.flyway_group
   login = false
 }
 
-resource "postgresql_grant" "flyway_provided_schema_usage" {
-  role        = postgresql_role.flyway_group.name
-  database    = var.database
-  schema      = postgresql_schema.database_schema.name
-  object_type = "schema"
-  privileges  = ["CREATE", "USAGE"]
+// !!IMPORTANT: every resource create below should depend on the previous run in single order and avoid deadlocks!
+resource "postgresql_grant_role" "user_assignment" {
+  role       = digitalocean_database_user.database_user.name
+  grant_role = postgresql_role.user_group.name
 
-  depends_on = [digitalocean_database_user.flyway_user]
-}
-
-resource "postgresql_grant" "flyway_public_schema_usage" {
-  role        = postgresql_role.flyway_group.name
-  database    = var.database
-  schema      = "public"
-  object_type = "schema"
-  privileges  = ["CREATE", "USAGE"]
-
-  depends_on = [digitalocean_database_user.flyway_user]
+  depends_on = [postgresql_role.flyway_group]
 }
 
 resource "postgresql_grant_role" "flyway_assignment" {
   role       = digitalocean_database_user.flyway_user.name
   grant_role = postgresql_role.flyway_group.name
 
-  depends_on = [digitalocean_database_user.flyway_user, postgresql_role.flyway_group]
+  depends_on = [postgresql_grant_role.user_assignment]
+}
+
+resource "postgresql_grant" "user_provided_schema_usage" {
+  role        = postgresql_role.user_group.name
+  database    = local.database
+  schema      = postgresql_schema.database_schema.name
+  object_type = "schema"
+  privileges  = ["USAGE"]
+
+  depends_on = [postgresql_grant_role.flyway_assignment]
+}
+
+resource "postgresql_grant" "flyway_provided_schema_usage" {
+  role        = postgresql_role.flyway_group.name
+  database    = local.database
+  schema      = postgresql_schema.database_schema.name
+  object_type = "schema"
+  privileges  = ["CREATE", "USAGE"]
+
+  depends_on = [postgresql_grant.user_provided_schema_usage]
+}
+
+resource "postgresql_grant" "flyway_public_schema_usage" {
+  role        = postgresql_role.flyway_group.name
+  database    = local.database
+  schema      = "public"
+  object_type = "schema"
+  privileges  = ["CREATE", "USAGE"]
+
+  depends_on = [postgresql_grant.flyway_provided_schema_usage]
+}
+
+resource "postgresql_default_privileges" "flyway_sequences_to_user" {
+  role        = postgresql_role.user_group.name
+  database    = local.database
+  schema      = postgresql_schema.database_schema.name
+  owner       = digitalocean_database_user.flyway_user.name
+  object_type = "sequence"
+  privileges  = ["USAGE"]
+
+  depends_on = [postgresql_grant.flyway_public_schema_usage]
+}
+
+resource "postgresql_default_privileges" "flyway_tables_to_user" {
+  role        = postgresql_role.user_group.name
+  database    = local.database
+  schema      = postgresql_schema.database_schema.name
+  owner       = digitalocean_database_user.flyway_user.name
+  object_type = "table"
+  privileges  = ["SELECT", "INSERT", "UPDATE", "DELETE"]
+
+  depends_on = [postgresql_default_privileges.flyway_sequences_to_user]
 }
