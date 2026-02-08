@@ -61,8 +61,8 @@ resource "digitalocean_database_postgresql_config" "pg_config" {
 resource "digitalocean_database_firewall" "block_all" {
   cluster_id = digitalocean_database_cluster.pg_cluster.id
 
-    rule {
-      type  = "tag"
-      value = "block-all"
-    }
+  rule {
+    type  = "ip_addr"
+    value = "127.0.0.1"
+  }
 }
