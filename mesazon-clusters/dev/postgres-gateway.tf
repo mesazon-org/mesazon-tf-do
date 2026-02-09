@@ -9,7 +9,7 @@ module "gateway_pg_cluster" {
   cluster_region     = local.region
   cluster_node_count = 1
 
-  vpc_name_raw = "gateway-vpc"
-
   database_raw = "gateway_db"
+
+  vpc_name_raw = "gateway-vpc"
 }

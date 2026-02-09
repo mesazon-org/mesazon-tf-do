@@ -11,4 +11,6 @@ module "gateway_pg_configure" {
   database_raw = "gateway_db"
   user_raw     = "gateway"
   schema_raw   = "gateway"
+
+  vpc_name_raw = "gateway-vpc"
 }

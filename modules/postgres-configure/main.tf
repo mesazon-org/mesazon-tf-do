@@ -16,6 +16,10 @@ data "digitalocean_database_cluster" "postgres_cluster" {
   name = local.cluster_name
 }
 
+data "digitalocean_vpc" "vpc" {
+  name = local.vpc_name
+}
+
 resource "digitalocean_database_firewall" "pg_firewall" {
   cluster_id = data.digitalocean_database_cluster.postgres_cluster.id
 
