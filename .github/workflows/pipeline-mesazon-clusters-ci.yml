@@ -40,7 +40,7 @@ jobs:
     secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
     with:
       firewall-module: "module.gateway_pg_configure.digitalocean_database_firewall.pg_firewall"
-      project-id: ""
+      project-id: "" # Not used in cluster configuration
       working-directory: "mesazon-clusters-configure/dev"
       module: "mesazon-clusters-configure-dev"
 
@@ -51,7 +51,7 @@ jobs:
     secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
     with:
       firewall-module: "module.gateway_pg_configure.digitalocean_database_firewall.pg_firewall"
-      project-id: ""
+      project-id: "" # Not used in cluster configuration
       working-directory: "mesazon-clusters-configure/dev"
       module: "mesazon-clusters-configure-dev"
       environment: "dev"

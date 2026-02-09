@@ -16,7 +16,7 @@ jobs:
     uses: ./.github/workflows/job-tf-plan.yml
     secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
     with:
-      project-id: ""
+      project-id: "" # Not used in mesazon-vpc-dev
       working-directory: "mesazon-vpc/dev"
       module: "mesazon-vpc-dev"
 
@@ -26,7 +26,7 @@ jobs:
     uses: ./.github/workflows/job-tf-apply.yml
     secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
     with:
-      project-id: ""
+      project-id: "" # Not used in mesazon-vpc
       working-directory: "mesazon-vpc/dev"
       module: "mesazon-vpc-dev"
       environment: "dev"
