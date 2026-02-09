@@ -1,0 +1,32 @@
+name: mesazon-vpc-ci
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - ".github/**"
+      - 'mesazon-vpc/**'
+      - 'modules/**'
+  pull_request:
+    paths:
+      - ".github/**"
+      - 'mesazon-vpc/**'
+      - 'modules/**'
+jobs:
+  mesazon-vpc-dev-tf-plan:
+    uses: ./.github/workflows/job-tf-plan.yml
+    secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
+    with:
+      project-id: "" # Not used in mesazon-vpc-dev
+      working-directory: "mesazon-vpc/dev"
+      module: "mesazon-vpc-dev"
+
+  mesazon-vpc-dev-tf-apply:
+    needs: [ "mesazon-vpc-dev-tf-plan" ]
+    if: needs.mesazon-vpc-dev-tf-plan.outputs.changes-detected == 'true'
+    uses: ./.github/workflows/job-tf-apply.yml
+    secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
+    with:
+      project-id: "" # Not used in mesazon-vpc
+      working-directory: "mesazon-vpc/dev"
+      module: "mesazon-vpc-dev"
+      environment: "dev"
