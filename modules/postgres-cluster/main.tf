@@ -11,6 +11,10 @@ data "digitalocean_project" "project" {
   id = var.project_id
 }
 
+data "digitalocean_vpc" "vpc" {
+  name = local.vpc_name
+}
+
 resource "digitalocean_database_cluster" "pg_cluster" {
   project_id = var.project_id
 
@@ -21,6 +25,8 @@ resource "digitalocean_database_cluster" "pg_cluster" {
   region     = var.cluster_region
   node_count = var.cluster_node_count
   tags       = local.common_tags
+
+  private_network_uuid = data.digitalocean_vpc.vpc.id
 
   lifecycle {
     prevent_destroy = true
