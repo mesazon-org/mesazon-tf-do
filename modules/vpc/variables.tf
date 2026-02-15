@@ -1,5 +1,5 @@
 variable "environment" {
-  description = "The environment for which to configure the database."
+  description = "The environment for which to configure the VPC."
   type        = string
 }
 
