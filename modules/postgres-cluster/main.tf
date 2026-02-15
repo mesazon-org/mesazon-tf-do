@@ -11,6 +11,10 @@ data "digitalocean_project" "project" {
   id = var.project_id
 }
 
+# NOTE: This data source assumes the VPC already exists, typically created
+# in a separate Terraform workspace (e.g., mesazon-vpc/<env>). If the VPC
+# has not been created yet, this lookup will fail on first apply. Ensure
+# the VPC workspace is applied before this module is applied.
 data "digitalocean_vpc" "vpc" {
   name = local.vpc_name
 }
