@@ -14,6 +14,6 @@ variable "vpc_name_raw" {
 }
 
 variable "ip_range" {
-  description = "The private IP range for the VPC in CIDR notation"
+  description = "The private IP range for the VPC in CIDR notation."
   type        = string
 }
