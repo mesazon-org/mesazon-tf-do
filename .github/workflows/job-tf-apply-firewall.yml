@@ -61,12 +61,15 @@ jobs:
           -target=${{ inputs.firewall-module }}
       - name: Terraform apply
         id: apply
-        run: terraform apply -auto-approve -input=false -detailed-exitcode
+        run: terraform apply -auto-approve -input=false
         continue-on-error: true
       - name: Terraform destroy firewall
         run: |
-          terraform destroy -auto-approve -input=false \
-          -target=${{ inputs.firewall-module }}
+          terraform apply -auto-approve -input=false \
+          -target=${{ inputs.firewall-module }} \
+          -var="disable_runner_ip=true"
       - name: Terraform apply status
-        if: steps.apply.outputs.exitcode == 1
-        run: exit 1
+        if: steps.apply.outcome == 'failure'
+        run: |
+          echo "The Terraform apply step failed."
+          exit 1

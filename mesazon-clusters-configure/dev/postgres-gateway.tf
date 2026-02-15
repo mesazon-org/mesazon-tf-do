@@ -1,7 +1,8 @@
 module "gateway_pg_configure" {
   source = "../../modules/postgres-configure"
 
-  runner_ip = var.runner_ip
+  runner_ip         = var.runner_ip
+  disable_runner_ip = var.disable_runner_ip
 
   cluster_name_raw = "gateway"
   environment      = local.environment
@@ -10,4 +11,6 @@ module "gateway_pg_configure" {
   database_raw = "gateway_db"
   user_raw     = "gateway"
   schema_raw   = "gateway"
+
+  vpc_name_raw = "gateway-vpc"
 }

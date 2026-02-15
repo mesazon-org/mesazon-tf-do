@@ -10,4 +10,6 @@ module "gateway_pg_cluster" {
   cluster_node_count = 1
 
   database_raw = "gateway_db"
+
+  vpc_name_raw = "gateway-vpc"
 }

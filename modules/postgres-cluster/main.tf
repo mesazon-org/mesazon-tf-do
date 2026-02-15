@@ -11,6 +11,14 @@ data "digitalocean_project" "project" {
   id = var.project_id
 }
 
+# NOTE: This data source assumes the VPC already exists, typically created
+# in a separate Terraform workspace (e.g., mesazon-vpc/<env>). If the VPC
+# has not been created yet, this lookup will fail on first apply. Ensure
+# the VPC workspace is applied before this module is applied.
+data "digitalocean_vpc" "vpc" {
+  name = local.vpc_name
+}
+
 resource "digitalocean_database_cluster" "pg_cluster" {
   project_id = var.project_id
 
@@ -21,6 +29,8 @@ resource "digitalocean_database_cluster" "pg_cluster" {
   region     = var.cluster_region
   node_count = var.cluster_node_count
   tags       = local.common_tags
+
+  private_network_uuid = data.digitalocean_vpc.vpc.id
 
   lifecycle {
     prevent_destroy = true
