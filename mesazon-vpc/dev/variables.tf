@@ -5,5 +5,6 @@ variable "do_token" {
 }
 
 variable "project_id" {
-  type = string
+  description = "DigitalOcean project ID where this VPC's resources will be managed"
+  type        = string
 }
