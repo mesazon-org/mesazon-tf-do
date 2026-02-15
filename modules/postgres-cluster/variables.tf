@@ -75,5 +75,3 @@ variable "vpc_name_raw" {
   description = "The raw name for the VPC, which will be combined with the environment and region to create the final name."
   type        = string
 }
-
-
