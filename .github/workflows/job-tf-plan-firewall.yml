@@ -79,6 +79,8 @@ jobs:
           fi
       - name: Terraform destroy firewall
         run: |
+          # Ensure the runner IP is not passed to Terraform when disabling it
+          unset TF_VAR_runner_ip
           terraform apply -auto-approve -input=false \
           -target=${{ inputs.firewall-module }} \
           -var="disable_runner_ip=true"
