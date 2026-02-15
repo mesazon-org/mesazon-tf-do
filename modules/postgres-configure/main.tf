@@ -16,6 +16,11 @@ data "digitalocean_database_cluster" "postgres_cluster" {
   name = local.cluster_name
 }
 
+// NOTE:
+// This module assumes that the target VPC already exists and is managed in a
+// separate Terraform workspace (e.g., "mesazon-vpc/dev"). Ensure that the VPC
+// workspace is applied successfully before applying this module, otherwise this
+// data source lookup will fail on first apply.
 data "digitalocean_vpc" "vpc" {
   name = local.vpc_name
 }
