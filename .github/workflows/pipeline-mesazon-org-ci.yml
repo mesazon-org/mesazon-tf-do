@@ -21,7 +21,7 @@ jobs:
       module: "mesazon-org"
   mesazon-org-tf-apply:
     needs: [ "mesazon-org-tf-plan" ]
-    if: github.ref == 'refs/heads/main' && needs.mesazon-org-tf-plan.outputs.changes-detected == 'true'
+    if: needs.mesazon-org-tf-plan.outputs.changes-detected == 'true'
     uses: ./.github/workflows/job-tf-apply.yml
     secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
     with:
