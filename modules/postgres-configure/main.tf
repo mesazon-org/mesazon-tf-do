@@ -50,7 +50,7 @@ provider "postgresql" {
 
 resource "postgresql_schema" "database_schema" {
   name          = local.schema
-  owner         = postgresql_role.user_group.name
+  owner         = postgresql_role.flyway_group.name
   if_not_exists = true
 }
 
