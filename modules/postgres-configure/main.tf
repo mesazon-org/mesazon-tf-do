@@ -92,6 +92,15 @@ resource "postgresql_grant_role" "flyway_assignment" {
   depends_on = [postgresql_grant_role.user_assignment]
 }
 
+resource "postgresql_grant" "flyway_database_privileges" {
+  database    = local.database
+  role        = postgresql_role.flyway_group.name
+  object_type = "database"
+  privileges  = ["CONNECT", "CREATE", "TEMPORARY"]
+
+  depends_on = [postgresql_grant_role.flyway_assignment]
+}
+
 resource "postgresql_grant" "user_provided_schema_usage" {
   role        = postgresql_role.user_group.name
   database    = local.database
@@ -99,7 +108,7 @@ resource "postgresql_grant" "user_provided_schema_usage" {
   object_type = "schema"
   privileges  = ["USAGE"]
 
-  depends_on = [postgresql_grant_role.flyway_assignment]
+  depends_on = [postgresql_grant.flyway_database_privileges]
 }
 
 resource "postgresql_grant" "flyway_provided_schema_usage" {
