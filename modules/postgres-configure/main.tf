@@ -50,7 +50,8 @@ provider "postgresql" {
 
 resource "postgresql_schema" "database_schema" {
   name          = local.schema
-  owner         = postgresql_role.flyway_group.name
+  // !! IMPORTANT: the owner of the schema must be the same as the owner of the default privileges below, otherwise the grants will fail with "must be owner of schema" error
+  owner         = postgresql_role.user_group.name
   if_not_exists = true
 }
 
