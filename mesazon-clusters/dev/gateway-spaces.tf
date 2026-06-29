@@ -6,4 +6,5 @@ module "gateway_logos_bucket" {
 
   bucket_name_raw = "gateway-organization-logos"
   acl             = "public-read"
+  force_destroy   = true
 }
