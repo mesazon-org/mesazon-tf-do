@@ -4,6 +4,6 @@ module "gateway_logos_bucket" {
   environment = local.environment
   region      = local.region
 
-  bucket_name_raw = "gateway-logos"
+  bucket_name_raw = "gateway-organization-logos"
   acl             = "public-read"
 }
