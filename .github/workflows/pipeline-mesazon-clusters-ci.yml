@@ -22,22 +22,8 @@ jobs:
       working-directory: "mesazon-clusters/dev"
       module: "mesazon-clusters-dev"
 
-  # TEMPORARY: destroy the old logos bucket so apply can recreate it under the
-  # new name (gateway-organization-logos). Remove this job once it has run once.
-  mesazon-clusters-dev-tf-destroy-logos-bucket:
-    needs: [ "mesazon-clusters-dev-tf-plan" ]
-    if: needs.mesazon-clusters-dev-tf-plan.outputs.changes-detected == 'true'
-    uses: ./.github/workflows/job-tf-destroy.yml
-    secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
-    with:
-      project-id: "33eee19d-9b81-4846-b24f-c39bf70fe1f5"
-      working-directory: "mesazon-clusters/dev"
-      module: "mesazon-clusters-dev"
-      environment: "dev"
-      destroy-target: "module.gateway_logos_bucket.digitalocean_spaces_bucket.main"
-
   mesazon-clusters-dev-tf-apply:
-    needs: [ "mesazon-clusters-dev-tf-plan", "mesazon-clusters-dev-tf-destroy-logos-bucket" ]
+    needs: [ "mesazon-clusters-dev-tf-plan" ]
     if: needs.mesazon-clusters-dev-tf-plan.outputs.changes-detected == 'true'
     uses: ./.github/workflows/job-tf-apply.yml
     secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets

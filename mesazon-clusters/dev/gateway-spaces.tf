@@ -1,4 +1,4 @@
-module "gateway_logos_bucket" {
+module "gateway_organization_logos_bucket" {
   source = "../../modules/spaces-bucket"
 
   environment = local.environment
@@ -6,5 +6,4 @@ module "gateway_logos_bucket" {
 
   bucket_name_raw = "gateway-organization-logos"
   acl             = "public-read"
-  force_destroy   = true
 }
