@@ -24,3 +24,9 @@ variable "force_destroy" {
   type        = bool
   default     = false
 }
+
+variable "access_key_permission" {
+  description = "Permission granted to the scoped access key (read, readwrite, fullaccess)."
+  type        = string
+  default     = "readwrite"
+}
