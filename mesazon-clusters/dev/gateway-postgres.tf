@@ -4,6 +4,8 @@ module "gateway_pg_cluster" {
   project_id  = var.project_id
   environment = local.environment
 
+  cluster_enabled = var.cluster_enabled
+
   cluster_name_raw   = "gateway"
   cluster_size       = "db-s-1vcpu-1gb"
   cluster_region     = local.region
