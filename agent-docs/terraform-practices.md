@@ -84,7 +84,9 @@ underscore — Postgres identifiers:
 "${var.user_raw}_flyway_user_${var.region}_${var.environment}"
 "${var.schema_raw}_schema_${var.region}_${var.environment}"
 ```
-exception: `container-registry` = `"${raw}-${region}"`, no environment (globally unique, shared).
+exceptions — only these two, do not invent more:
+- `container-registry` = `"${raw}-${region}"`, no environment (globally unique, shared)
+- `dns-zone` = no composition at all. Variable is `domain_name`, not `domain_name_raw`; module has no `locals.tf`. A zone name must equal the registered domain exactly (`mesazon.space`). Env separation for DNS is at the record level (`api.dev.mesazon.space`), never in the zone name.
 
 block labels: `snake_case`. Existing kebab-case blocks (`module "gateway-vpc"`, `module "mesazon-registry"`) are legacy — do not replicate, do not rename without `terraform state mv`.
 
@@ -129,9 +131,22 @@ data "digitalocean_database_cluster" "postgres_cluster" { name = local.cluster_n
 ```bash
 terraform fmt -recursive                  # from repo root, always
 cd <changed-dir> && terraform init -backend=false && terraform validate
+find . -name '.terraform.lock.hcl' -not -path './.git/*' -delete
 ```
 
 - `fmt` is repo-wide in CI; one bad file fails everything
 - backend unreachable locally; `-backend=false` is required
 - changed a module interface → validate the module AND every stack calling it
 - never run `terraform apply` locally; CI owns apply
+- lock files are untracked here; delete what `init` generates before committing
+
+## docs — same commit as the change, not a follow-up
+
+Mandatory third validation step. Drift here causes wrong changes later, because these files are what agents read before naming resources or wiring state.
+
+- new stack → stack table in `CLAUDE.md`
+- new module → child-module list in `CLAUDE.md` + module list in `README.md`
+- new naming rule or exception → naming section here + `CLAUDE.md`
+- new/changed workflow or job input → `agent-docs/github-actions-practices.md`
+- deliberate deviation from a convention → record it as an exception, here, under the matching heading. Undocumented deviation is indistinguishable from a bug and gets "fixed" by the next agent.
+- **if a change makes any line in `CLAUDE.md` or `agent-docs/` false, fix that line in the same commit**

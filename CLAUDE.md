@@ -29,16 +29,17 @@ subdirectory.
 | --- | --- | --- |
 | `mesazon-org/` | `mesazon-org` | DO projects |
 | `mesazon-shared/` | `mesazon-shared` | Cross-environment resources (container registry) |
+| `mesazon-dns/` | `mesazon-dns` | DNS zones |
 | `mesazon-vpc/<env>/` | `mesazon-vpc-<env>` | VPCs |
 | `mesazon-clusters/<env>/` | `mesazon-clusters-<env>` | Postgres clusters, Spaces buckets |
 | `mesazon-clusters-configure/<env>/` | `mesazon-clusters-configure-<env>` | In-database objects, DB firewall |
 
-`mesazon-org` and `mesazon-shared` have no `<env>` subdirectory because their
-resources are global.
+`mesazon-org`, `mesazon-shared` and `mesazon-dns` have no `<env>` subdirectory
+because their resources are global.
 
 **Child modules** — `modules/<resource>/`. Reusable, never applied directly,
-never hold a backend or state: `container-registry`, `postgres-cluster`,
-`postgres-configure`, `spaces-bucket`, `vpc`.
+never hold a backend or state: `container-registry`, `dns-zone`,
+`postgres-cluster`, `postgres-configure`, `spaces-bucket`, `vpc`.
 
 ### Files inside a stack
 
@@ -94,9 +95,17 @@ flyway_user  = "gateway_flyway_user_fra1_dev"
 flyway_group = "gateway_flyway_group_fra1_dev"
 ```
 
-One deliberate exception: `container-registry` composes `${raw}-${region}` with
-no environment, because DO registry names are globally unique and the registry
-is shared across environments.
+Two deliberate exceptions:
+
+- `container-registry` composes `${raw}-${region}` with no environment, because
+  DO registry names are globally unique and the registry is shared across
+  environments.
+- `dns-zone` composes **nothing**. It takes a plain `domain_name` (not
+  `domain_name_raw`) and has no `locals.tf`, because a DNS zone name is a real,
+  globally-unique DNS name that must match the registered domain exactly —
+  `mesazon.space`, never `mesazon.space-fra1-dev`. Environment separation for
+  DNS happens at the record level (`api.dev.mesazon.space`), not in the zone
+  name.
 
 Terraform block labels are `snake_case` (`module "gateway_pg_cluster"`,
 `resource ... "pg_cluster"`). A few older blocks use kebab-case
@@ -144,6 +153,11 @@ What differs per environment:
 
 ## Validation and formatting — required for every change
 
+Three steps. None of them are optional, and the third is the one most often
+skipped.
+
+### 1. Format
+
 CI runs `terraform fmt -check -recursive` from the repo root on **every** push
 and pull request that touches anything but `.gitignore`/`README.md`. A single
 misformatted file anywhere fails the whole repo's CI. Run this before you are
@@ -153,8 +167,10 @@ done, from the repo root:
 terraform fmt -recursive
 ```
 
-Then validate each stack or module directory you touched. The real backend is
-not reachable locally, so initialise without it:
+### 2. Validate
+
+Validate each stack or module directory you touched. The real backend is not
+reachable locally, so initialise without it:
 
 ```bash
 cd <stack-or-module-dir>
@@ -167,20 +183,47 @@ errors; validating a stack that calls it exercises the wiring, so do both when
 you change a module's interface.
 
 Note that `.terraform.lock.hcl` files are not committed in this repo — CI
-re-resolves providers on every run.
+re-resolves providers on every run. Delete any that `init` generates before
+committing.
+
+### 3. Update the docs, in the same commit
+
+**If a change makes any sentence in `CLAUDE.md` or `agent-docs/` false, fixing it
+is part of that change, not a follow-up.** Documentation drift here is not
+cosmetic: these files are what agents read to decide how to name resources and
+wire state, so a stale line actively causes bad changes later.
+
+What triggers what:
+
+| You added or changed | Update |
+| --- | --- |
+| A stack | Stack table in this file; `README.md` if it introduces a module |
+| A module | Child-module list in this file; module list in `README.md` |
+| A naming rule, or a deliberate exception to one | Naming section in this file **and** `agent-docs/terraform-practices.md` |
+| A `pipeline-*.yml` or `job-*.yml`, or a job's inputs | `agent-docs/github-actions-practices.md` |
+| A new convention, or a knowingly-broken one | The relevant `agent-docs/` file, under the matching heading |
+
+A deliberate deviation from a convention must be written down as an exception.
+An undocumented deviation is indistinguishable from a mistake and will be
+"corrected" by whoever touches it next.
 
 ## Adding a new stack
 
 1. Create `mesazon-<name>/` (add `<env>/` if the resources are per-environment).
 2. Copy `providers.tf` verbatim from an existing stack of the same shape.
-3. Add `locals.tf` with `region` and `environment`.
+3. Add `locals.tf` with `region` and `environment` — omit it entirely if the
+   stack's resources are both region-less and environment-less, as in
+   `mesazon-dns`. Do not carry an unused local; `validate` will not flag it.
 4. Add `variables.tf` with `do_token`, plus `project_id` if resources are
    assigned to a DO project.
-5. Add resource files named `<consumer>-<resource-type>.tf`.
+5. Add resource files named `<consumer>-<resource-type>.tf`, or the plural
+   resource noun (`domains.tf`, `projects.tf`) where there is no consumer.
 6. Add `.github/workflows/pipeline-mesazon-<name>-ci.yml` following
    `pipeline-mesazon-vpc-ci.yml`, with path filters on `.github/**`, the new
    stack directory, and `modules/**`.
-7. Format, validate, open a PR and read the plan comment before merging.
+7. Update the docs per step 3 of the validation section — at minimum the stack
+   table above.
+8. Format, validate, open a PR and read the plan comment before merging.
 
 ## Details
 

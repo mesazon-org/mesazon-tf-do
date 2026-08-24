@@ -149,3 +149,25 @@ jobs:
 ```
 
 Per-environment stack → append `/<env>` to `working-directory`, `-<env>` to `module`, set `environment` accordingly, and duplicate the pair per environment with `needs` chaining dev → prod.
+
+## validation — before finishing any workflow change
+
+```bash
+ruby -ryaml -e 'YAML.safe_load(File.read("<file>"), aliases: true); puts "YAML OK"'
+```
+
+(`python3 -c "import yaml"` is unavailable on this machine; use ruby or `yq`.)
+
+- reusable job changed → check every `pipeline-*.yml` that calls it still passes required inputs
+- `module` input changed on an existing stack → orphans state. Do not, unless migrating deliberately.
+- new pipeline → confirm path filters include `.github/**` and `modules/**`
+
+## docs — same commit as the change, not a follow-up
+
+Mandatory. If a change makes any line in this file false, fix it in the same commit.
+
+- new `pipeline-*.yml` → no table here lists pipelines, but confirm the new-pipeline template at the end still matches what you wrote
+- new `job-*.yml` → add a row to the reusable-jobs table
+- added/renamed/removed a job input → update the job-inputs list AND the template
+- new secret or `TF_VAR_*` → update the secrets table
+- new mechanism (a firewall-style wrapper, a new gating rule) → new section here, plus a line in `CLAUDE.md` if it changes how stacks deploy
