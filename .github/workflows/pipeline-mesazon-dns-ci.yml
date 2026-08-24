@@ -1,0 +1,31 @@
+name: mesazon-dns-ci
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - ".github/**"
+      - 'mesazon-dns/**'
+      - 'modules/**'
+  pull_request:
+    paths:
+      - ".github/**"
+      - 'mesazon-dns/**'
+      - 'modules/**'
+jobs:
+  mesazon-dns-tf-plan:
+    uses: ./.github/workflows/job-tf-plan.yml
+    secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
+    with:
+      project-id: "" # Not used in mesazon-dns
+      working-directory: "mesazon-dns"
+      module: "mesazon-dns"
+  mesazon-dns-tf-apply:
+    needs: [ "mesazon-dns-tf-plan" ]
+    if: needs.mesazon-dns-tf-plan.outputs.changes-detected == 'true'
+    uses: ./.github/workflows/job-tf-apply.yml
+    secrets: inherit # Inherit secrets from the parent workflow https://stackoverflow.com/questions/66113900/github-actions-not-receiving-secrets
+    with:
+      project-id: "" # Not used in mesazon-dns
+      working-directory: "mesazon-dns"
+      module: "mesazon-dns"
+      environment: "prod"
