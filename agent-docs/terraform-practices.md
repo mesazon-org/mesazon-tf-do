@@ -86,7 +86,7 @@ underscore — Postgres identifiers:
 ```
 exceptions — only these two, do not invent more:
 - `container-registry` = `"${raw}-${region}"`, no environment (globally unique, shared)
-- `dns-zone` = no composition at all. Variable is `domain_name`, not `domain_name_raw`; module has no `locals.tf`. A zone name must equal the registered domain exactly (`mesazon.space`). Env separation for DNS is at the record level (`api.dev.mesazon.space`), never in the zone name.
+- `dns-zone` = no composition at all. Variable is `domain_name`, not `domain_name_raw`; module has no `locals.tf`. A zone name must equal the registered domain exactly (`mesazon.site`). Env separation for DNS is at the record level (`api.dev.mesazon.site`), never in the zone name.
 
 block labels: `snake_case`. Existing kebab-case blocks (`module "gateway-vpc"`, `module "mesazon-registry"`) are legacy — do not replicate, do not rename without `terraform state mv`.
 

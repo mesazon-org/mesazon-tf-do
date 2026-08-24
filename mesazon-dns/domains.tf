@@ -1,5 +1,5 @@
-module "mesazon_space_zone" {
+module "mesazon_site_zone" {
   source = "../modules/dns-zone"
 
-  domain_name = "mesazon.space"
+  domain_name = "mesazon.site"
 }

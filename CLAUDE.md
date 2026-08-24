@@ -103,8 +103,8 @@ Two deliberate exceptions:
 - `dns-zone` composes **nothing**. It takes a plain `domain_name` (not
   `domain_name_raw`) and has no `locals.tf`, because a DNS zone name is a real,
   globally-unique DNS name that must match the registered domain exactly —
-  `mesazon.space`, never `mesazon.space-fra1-dev`. Environment separation for
-  DNS happens at the record level (`api.dev.mesazon.space`), not in the zone
+  `mesazon.site`, never `mesazon.site-fra1-dev`. Environment separation for
+  DNS happens at the record level (`api.dev.mesazon.site`), not in the zone
   name.
 
 Terraform block labels are `snake_case` (`module "gateway_pg_cluster"`,
