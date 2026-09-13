@@ -1,0 +1,38 @@
+name: registry-retention-cleanup
+
+on:
+  schedule:
+    - cron: "0 3 * * 1" # weekly, Monday 03:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  prune-and-gc:
+    runs-on: ubuntu-latest
+    environment: prod # DO_API_KEY lives here, same as mesazon-shared's apply job
+    env:
+      KEEP: 10
+    steps:
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_API_KEY }}
+
+      - name: Prune tags beyond retention limit
+        run: |
+          set -euo pipefail
+          repos="$(doctl registry repository list --format Name --no-header)"
+          for repo in $repos; do
+            echo "== $repo =="
+            tags="$(doctl registry repository list-tags "$repo" --format Tag,UpdatedAt --no-header | sort -k2)"
+            count="$(printf '%s\n' "$tags" | grep -c . || true)"
+            if [ "$count" -gt "$KEEP" ]; then
+              to_delete=$((count - KEEP))
+              printf '%s\n' "$tags" | head -n "$to_delete" | awk '{print $1}' | while read -r tag; do
+                echo "deleting $repo:$tag"
+                doctl registry repository delete-tag "$repo" "$tag" --force
+              done
+            fi
+          done
+
+      - name: Reclaim space via garbage collection
+        run: doctl registry garbage-collection start --include-untagged-manifests --force
