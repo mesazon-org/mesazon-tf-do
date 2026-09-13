@@ -20,14 +20,18 @@ jobs:
       - name: Prune tags beyond retention limit
         run: |
           set -euo pipefail
-          repos="$(doctl registry repository list-v2 --format Name --no-header)"
-          for repo in $repos; do
+          # -o json + jq, not --format/--no-header text parsing: doctl's
+          # text output has proven unreliable at suppressing the header row
+          # (it showed up as a fake repository named "Name"), so avoid it.
+          mapfile -t repos < <(doctl registry repository list-v2 -o json | jq -r '.[].name')
+          for repo in "${repos[@]}"; do
             echo "== $repo =="
-            tags="$(doctl registry repository list-tags "$repo" --format Tag,UpdatedAt --no-header | sort -k2)"
-            count="$(printf '%s\n' "$tags" | grep -c . || true)"
+            tags_json="$(doctl registry repository list-tags "$repo" -o json)"
+            count="$(jq 'length' <<<"$tags_json")"
             if [ "$count" -gt "$KEEP" ]; then
               to_delete=$((count - KEEP))
-              printf '%s\n' "$tags" | head -n "$to_delete" | awk '{print $1}' | while read -r tag; do
+              mapfile -t stale < <(jq -r 'sort_by(.updated_at) | .[].tag' <<<"$tags_json" | head -n "$to_delete")
+              for tag in "${stale[@]}"; do
                 echo "deleting $repo:$tag"
                 doctl registry repository delete-tag "$repo" "$tag" --force
               done
