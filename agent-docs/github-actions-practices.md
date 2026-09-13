@@ -2,10 +2,15 @@
 
 Agent reference. Rules, not prose. See `CLAUDE.md` for layout overview.
 
-## two file kinds
+## three file kinds
 
 - `job-*.yml` — reusable, `on: workflow_call`. Generic. Never stack-specific.
 - `pipeline-*-ci.yml` — one per stack. `on: push`/`pull_request` with path filters. Only wiring: inputs + `needs` + `if`.
+- `scheduled-*.yml` — cron/`workflow_dispatch`-triggered maintenance, not tied
+  to any Terraform stack or state key. No path filters (nothing to scope to),
+  no `terraform` step, doesn't call `job-tf-*`. Currently just
+  `scheduled-registry-retention.yml`, which prunes DOCR tags and runs garbage
+  collection — see below.
 
 Add a stack → add one `pipeline-*.yml`. Never add a `job-*.yml` unless the *mechanism* is new.
 
@@ -49,6 +54,11 @@ Always partial config via `-backend-config`. Never in `providers.tf`.
 | `DOCKER_TOKEN` | `TF_VAR_docker_token` |
 
 `SPACES_ACCESS_KEY_ID`/`SPACES_SECRET_ACCESS_KEY` are set only in the non-firewall plan/apply jobs (needed by the DO provider for Spaces buckets).
+
+`DO_API_KEY` is also consumed directly (not as a `TF_VAR_*`) by `doctl` in
+`scheduled-registry-retention.yml`. That workflow runs under the `prod`
+GitHub Environment for that reason — same environment `mesazon-shared`'s
+apply job uses to reach the same secret.
 
 Runner IP arrives via `candidob/get-runner-ip@v1.0.0` → `TF_VAR_runner_ip` in `$GITHUB_ENV`. Firewall jobs only.
 
