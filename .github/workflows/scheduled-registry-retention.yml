@@ -20,7 +20,7 @@ jobs:
       - name: Prune tags beyond retention limit
         run: |
           set -euo pipefail
-          repos="$(doctl registry repository list --format Name --no-header)"
+          repos="$(doctl registry repository list-v2 --format Name --no-header)"
           for repo in $repos; do
             echo "== $repo =="
             tags="$(doctl registry repository list-tags "$repo" --format Tag,UpdatedAt --no-header | sort -k2)"
