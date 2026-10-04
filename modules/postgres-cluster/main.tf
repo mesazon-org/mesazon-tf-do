@@ -20,6 +20,8 @@ data "digitalocean_vpc" "vpc" {
 }
 
 resource "digitalocean_database_cluster" "pg_cluster" {
+  count = var.cluster_enabled ? 1 : 0
+
   project_id = var.project_id
 
   name       = local.cluster_name
@@ -32,35 +34,38 @@ resource "digitalocean_database_cluster" "pg_cluster" {
 
   private_network_uuid = data.digitalocean_vpc.vpc.id
 
-  lifecycle {
-    prevent_destroy = true
-  }
+  # NOTE: no prevent_destroy here on purpose - this cluster is torn down and
+  # recreated on a schedule (see cluster_enabled) so it can only be
+  # provisioned during its active hours. Data does not persist across a
+  # sleep/wake cycle.
 }
 
 resource "digitalocean_database_db" "pg_db" {
-  cluster_id = digitalocean_database_cluster.pg_cluster.id
-  name       = local.database
+  count = var.cluster_enabled ? 1 : 0
 
-  lifecycle {
-    prevent_destroy = true
-  }
+  cluster_id = digitalocean_database_cluster.pg_cluster[0].id
+  name       = local.database
 
   depends_on = [digitalocean_database_cluster.pg_cluster]
 }
 
 resource "digitalocean_database_connection_pool" "pg_pool" {
-  cluster_id = digitalocean_database_cluster.pg_cluster.id
+  count = var.cluster_enabled ? 1 : 0
+
+  cluster_id = digitalocean_database_cluster.pg_cluster[0].id
   name       = local.connection_pool_name
   mode       = var.connection_pool_mode
   size       = var.connection_pool_size
-  db_name    = digitalocean_database_db.pg_db.name
-  user       = digitalocean_database_cluster.pg_cluster.user
+  db_name    = digitalocean_database_db.pg_db[0].name
+  user       = digitalocean_database_cluster.pg_cluster[0].user
 
   depends_on = [digitalocean_database_cluster.pg_cluster]
 }
 
 resource "digitalocean_database_postgresql_config" "pg_config" {
-  cluster_id                          = digitalocean_database_cluster.pg_cluster.id
+  count = var.cluster_enabled ? 1 : 0
+
+  cluster_id                          = digitalocean_database_cluster.pg_cluster[0].id
   timezone                            = var.timezone
   idle_in_transaction_session_timeout = var.idle_in_transaction_session_timeout
   log_min_duration_statement          = var.log_min_duration_statement

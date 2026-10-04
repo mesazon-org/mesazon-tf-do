@@ -75,3 +75,9 @@ variable "vpc_name_raw" {
   description = "The raw name for the VPC, which will be combined with the environment and region to create the final name."
   type        = string
 }
+
+variable "cluster_enabled" {
+  type        = bool
+  default     = true
+  description = "Whether the cluster (and its db/pool/config) should be provisioned. Set to false to tear them down, e.g. for a scheduled sleep window."
+}
