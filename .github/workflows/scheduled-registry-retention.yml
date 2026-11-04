@@ -8,7 +8,7 @@ on:
 jobs:
   prune-and-gc:
     runs-on: ubuntu-latest
-    environment: prod # DO_API_KEY lives here, same as mesazon-shared's apply job
+    environment: prod_cd # DO_API_KEY must exist here; no required reviewers, so the schedule runs unattended
     env:
       KEEP: 10
     steps:
