@@ -56,9 +56,9 @@ Always partial config via `-backend-config`. Never in `providers.tf`.
 `SPACES_ACCESS_KEY_ID`/`SPACES_SECRET_ACCESS_KEY` are set only in the non-firewall plan/apply jobs (needed by the DO provider for Spaces buckets).
 
 `DO_API_KEY` is also consumed directly (not as a `TF_VAR_*`) by `doctl` in
-`scheduled-registry-retention.yml`. That workflow runs under the `prod`
-GitHub Environment for that reason — same environment `mesazon-shared`'s
-apply job uses to reach the same secret.
+`scheduled-registry-retention.yml`. That workflow runs under the `prod_cd`
+GitHub Environment, so `DO_API_KEY` must be defined there. This differs from
+`mesazon-shared`'s apply job, which uses `prod`.
 
 Runner IP arrives via `candidob/get-runner-ip@v1.0.0` → `TF_VAR_runner_ip` in `$GITHUB_ENV`. Firewall jobs only.
 
