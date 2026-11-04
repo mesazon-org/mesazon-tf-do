@@ -57,8 +57,10 @@ Always partial config via `-backend-config`. Never in `providers.tf`.
 
 `DO_API_KEY` is also consumed directly (not as a `TF_VAR_*`) by `doctl` in
 `scheduled-registry-retention.yml`. That workflow runs under the `prod_cd`
-GitHub Environment, so `DO_API_KEY` must be defined there. This differs from
-`mesazon-shared`'s apply job, which uses `prod`.
+
+GitHub Environment, which must define `DO_API_KEY` and have no required
+reviewers, so the scheduled run is not blocked on manual approval. This differs
+from `mesazon-shared`'s apply job, which uses `prod`.
 
 Runner IP arrives via `candidob/get-runner-ip@v1.0.0` → `TF_VAR_runner_ip` in `$GITHUB_ENV`. Firewall jobs only.
 
