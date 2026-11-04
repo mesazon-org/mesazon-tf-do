@@ -57,6 +57,7 @@ Always partial config via `-backend-config`. Never in `providers.tf`.
 
 `DO_API_KEY` is also consumed directly (not as a `TF_VAR_*`) by `doctl` in
 `scheduled-registry-retention.yml`. That workflow runs under the `prod_cd`
+
 GitHub Environment, which must define `DO_API_KEY` and have no required
 reviewers, so the scheduled run is not blocked on manual approval. This differs
 from `mesazon-shared`'s apply job, which uses `prod`.
